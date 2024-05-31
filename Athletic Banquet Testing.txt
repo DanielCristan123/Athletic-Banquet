@@ -1,0 +1,232 @@
+
+HTML 
+
+!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login</h1>
+        <form id="loginForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p id="message"></p>
+    </div>
+
+    <div class="welcome-container" style="display:none;">
+        <h1>Welcome to Athletic Banquet</h1>
+        <form id="studentForm">
+            <label for="studentName">Student Name:</label>
+            <input type="text" id="studentName" name="studentName" required>
+            <button type="submit">Add Student</button>
+        </form>
+        <ul id="studentList"></ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+
+STYLES CSS
+
+
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.login-container, .welcome-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 300px;
+}
+
+input {
+    display: block;
+    margin: 10px 0;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 10px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+p {
+    color: red;
+}
+
+#welcome-container {
+    text-align: center;
+}
+
+#studentForm {
+    margin-top: 20px;
+}
+
+#studentList {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+#studentList li {
+    background-color: #f4f4f4;
+    margin: 10px 0;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.studentName {
+    flex-grow: 1;
+    text-align: left;
+}
+
+button.payButton {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    margin-left: 10px;
+    border-radius: 5px;
+}
+
+button.payButton.paid {
+    background-color: #28a745;
+}
+
+button.deleteButton {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-left: 10px;
+}
+
+button.deleteButton:hover {
+    background-color: #c82333;
+}
+
+
+
+
+JAVA SCRIPT
+
+
+document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const message = document.getElementById('message');
+
+    if (username === 'carter' && password === 'carter') {
+        document.querySelector('.login-container').style.display = 'none';
+        document.querySelector('.welcome-container').style.display = 'block';
+        loadStudents();
+    } else {
+        message.textContent = 'Invalid username or password!';
+    }
+});
+
+document.getElementById('studentForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const studentName = document.getElementById('studentName').value;
+    if (studentName) {
+        addStudent(studentName);
+        document.getElementById('studentName').value = '';
+    }
+});
+
+function addStudent(name) {
+    const students = getStudents();
+    students.push({ name: name, paid: false });
+    saveStudents(students);
+    renderStudents();
+}
+
+function togglePaidStatus(index) {
+    const students = getStudents();
+    students[index].paid = !students[index].paid;
+    saveStudents(students);
+    renderStudents();
+}
+
+function removeStudent(index) {
+    const students = getStudents();
+    students.splice(index, 1);
+    saveStudents(students);
+    renderStudents();
+}
+
+function renderStudents() {
+    const studentList = document.getElementById('studentList');
+    studentList.innerHTML = '';
+    const students = getStudents();
+
+    students.forEach((student, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span class="studentName">${student.name}</span>
+            <button class="payButton ${student.paid ? 'paid' : ''}" onclick="togglePaidStatus(${index})">
+                ${student.paid ? 'Paid' : 'Mark as Paid'}
+            </button>
+            <button class="deleteButton" onclick="removeStudent(${index})">Delete</button>
+        `;
+        studentList.appendChild(li);
+    });
+}
+
+function getStudents() {
+    return JSON.parse(localStorage.getItem('students')) || [];
+}
+
+function saveStudents(students) {
+    localStorage.setItem('students', JSON.stringify(students));
+}
+
+function loadStudents() {
+    renderStudents();
+}
+
+
+
